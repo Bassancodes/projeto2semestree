@@ -1,17 +1,12 @@
-# projeto2semestree
-Este projeto visa simular um banco onde existem funções que apertando cada número podem executar as seguintes ações: criar nova conta, remover conta, debitar, transferir ou sacar dinheiro das contas ou listar os clientes.
-LCD_RS equ P1.3
-LCD_EN equ P1.2
-LED_FECHADO equ P2.1 ; LED vermelho (fechado)
-LED_ABERTO equ P2.0  ; LED verde (aberto)
-
 org 0000h
     LJMP INICIO
 
 org 0030h
 INICIO:
-	 CLR LCD_EN
-	 SJMP $ ; Configura a senha padrão
+    CLR LCD_EN
+    SJMP $
+
+    ; Configura a senha padrão
     MOV 40H, #'0'
     MOV 41H, #'0'
     MOV 42H, #'0'
@@ -22,8 +17,8 @@ INICIO:
 
 CONFIGURA_LEDS:
     ; Inicializa o estado dos LEDs
-    SETB LED_FECHADO  ; Acende LED Vermelho (Fechado)
-    CLR LED_ABERTO    ; Apaga LED Verde (Aberto)
+    SETB LED_FECHADO ; Acende LED Vermelho (Fechado)
+    CLR LED_ABERTO   ; Apaga LED Verde (Aberto)
     RET
 
 EXIBE_MSG:
@@ -58,22 +53,25 @@ EXIBE_MSG:
     MOV A, #'A'
     ACALL escreveCaractere
     RET
-FULL: ; Função para aguardar `#` ou `*` quando a memória está cheia
+
+FULL:
+    ; Função para aguardar # ou * quando a memória está cheia
     ACALL leituraTeclado
-    JNB F0, FULL  ; Aguarda até que uma tecla seja pressionada
-    MOV A, #40H   ; Carrega o endereço base da memória onde a senha está armazenada
-    ADD A, R0     ; Adiciona o valor de R0 ao endereço para obter o valor da tecla
-    MOV R0, A     ; Move o valor resultante para R0
-    MOV A, @R0    ; Carrega o valor da memória no acumulador
-    CLR F0        ; Limpa a flag F0
-    CJNE A, #42, HASH ; Se o valor lido não for `*` (42), vá para HASH
-    CALL VERIFICA_SENHA ; Se for `*`, chama a função que verifica a senha
+    JNB F0, FULL ; Aguarda até que uma tecla seja pressionada
+    MOV A, #40H  ; Carrega o endereço base da memória onde a senha está armazenada
+    ADD A, R0    ; Adiciona o valor de R0 ao endereço para obter o valor da tecla
+    MOV R0, A    ; Move o valor resultante para R0
+    MOV A, @R0   ; Carrega o valor da memória no acumulador
+    CLR F0       ; Limpa a flag F0
+    CJNE A, #42, HASH ; Se o valor lido não for * (42), vá para HASH
+    CALL VERIFICA_SENHA ; Se for *, chama a função que verifica a senha
     RET
 
-HASH: 
-    CJNE A, #35, FULL ; Se o valor lido não for `#` (35), continue aguardando
-    CALL REDIFINE_SENHA ; Se for `#`, chama a função que redefine a senha
+HASH:
+    CJNE A, #35, FULL ; Se o valor lido não for # (35), continue aguardando
+    CALL REDIFINE_SENHA ; Se for #, chama a função que redefine a senha
     RET
+
 VERIFICA_SENHA:
     ; Função para verificar a senha digitada com a senha armazenada
     MOV R1, #40H ; Inicia o ponteiro na senha armazenada
@@ -99,10 +97,9 @@ VERIFICA_SENHA:
 ERRO:
     ; Exibe mensagem de erro e mantém LED vermelho
     ACALL MSG_ERRADA
-    SETB LED_FECHADO   ; Acende o LED vermelho (fechado)
-    CLR LED_ABERTO     ; Apaga o LED verde (aberto)
+    SETB LED_FECHADO ; Acende o LED vermelho (fechado)
+    CLR LED_ABERTO   ; Apaga o LED verde (aberto)
     RET
-
 
 REDIFINE_SENHA:
     ; Função para redefinir senha
@@ -179,11 +176,10 @@ MSG_ERRADA:
     ACALL escreveCaractere
     RET
 
-
 ABRE_FECHADURA:
     ; Abre a fechadura e acende o LED verde
-    CLR LED_FECHADO  ; Apaga o LED vermelho
-    SETB LED_ABERTO   ; Acende o LED verde
+    CLR LED_FECHADO ; Apaga o LED vermelho
+    SETB LED_ABERTO ; Acende o LED verde
     ACALL MSG_LIBERADO
     RET
 
@@ -243,12 +239,10 @@ teclaDetectada:
     RET
 
 inicializaLCD:
-	  CLR P1.2
-	  SETB P1.2
+    CLR P1.2
+    SETB P1.2
     CLR LCD_RS
     CLR P1.7
     SETB LCD_EN
     ACALL delay
-     
-RET
-  
+    RET
